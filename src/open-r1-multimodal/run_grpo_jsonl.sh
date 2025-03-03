@@ -3,7 +3,7 @@ cd src/open-r1-multimodal
 export DEBUG_MODE="true"
 export CUDA_VISIBLE_DEVICES=3,4,6
 
-RUN_NAME="Qwen2.5-VL-3B-GRPO-jsonl"
+RUN_NAME="Qwen2.5-VL-3B-GRPO-tabmwp"
 export LOG_PATH="./debug_log_$RUN_NAME.txt"
 
 torchrun --nproc_per_node="3" \
@@ -15,9 +15,9 @@ torchrun --nproc_per_node="3" \
     --deepspeed local_scripts/zero3.json \
     --output_dir output/$RUN_NAME \
     --model_name_or_path Qwen/Qwen2.5-VL-3B-Instruct \
-    --dataset_name JSONL \
-    --data_file_paths /shared/nas/data/m1/yangyic3/VLM-R1/VLM-R1/rec_jsons_processed/refcoco_train.jsonl \
-    --image_folders /shared/nas/data/m1/yangyic3/VLM-R1/VLM-R1  \
+    --dataset_name TabMWP \
+    --data_file_paths /shared/nas/data/m1/yangyic3/VLM-R1/VLM-R1/data/tabmwp/problems_train.jsonl \
+    --image_folders /shared/nas/data/m1/yangyic3/VLM-R1/VLM-R1/data/images  \
     --max_prompt_length 1024 \
     --num_generations 3 \
     --per_device_train_batch_size 1 \
@@ -35,3 +35,4 @@ torchrun --nproc_per_node="3" \
     --save_only_model true
 
 # original num generiaon = 8
+# rec_jsons_processed/refcoco_train.jsonl \
