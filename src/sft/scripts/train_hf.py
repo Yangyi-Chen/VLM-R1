@@ -9,8 +9,8 @@ import os
 import math
 from transformers import get_scheduler
 from accelerate.utils import DummyOptim, DummyScheduler, set_seed
-# from transformers import LlamaVForCausalLM, PreTrainedTokenizerFast
-import src.model
+from transformers import Qwen2_5_VLForConditionalGeneration, AutoProcessor
+
 
 import os
 from tqdm import tqdm
@@ -26,23 +26,23 @@ def main():
         config = yaml.safe_load(f)
 
 
-
     max_epochs = config["training"]["max_epochs"]
     accumulate_grad_batches = config["training"]["accumulate_grad_batches"]
-    checkpoint_every_n_steps = config["training"]["checkpoint_every_n_steps"]
     output_dir = config['output_dir']
     
+    
     # load model and data, optimizer
-    model = getattr(src.model, config["model"]["model_module"])()
-    tokenizer = model.tokenizer
-      
+    model = Qwen2_5_VLForConditionalGeneration.from_pretrained("Qwen/Qwen2.5-VL-3B-Instruct", cache_dir="./")
+    processor = AutoProcessor.from_pretrained("Qwen/Qwen2.5-VL-3B-Instruct")
+    
+    
     accelerator = Accelerator(gradient_accumulation_steps=accumulate_grad_batches, log_with="wandb", mixed_precision='bf16')    
     
 
    
     data_module = getattr(
         src.data, config["data"]["data_module"]
-    )(config, tokenizer)
+    )(config, processor)
     data_loader = data_module.train_dataloader()
     lr = config["training"]["lr"]
     # optimize those parameters that require grad
@@ -57,7 +57,7 @@ def main():
     
     # if args.max_train_steps is None:
     max_train_steps = max_epochs * num_update_steps_per_epoch
-    num_warmup_steps = 50
+    num_warmup_steps = 0
 
     # New Code #
     # Creates Dummy Scheduler if `scheduler` was specified in the config file else creates `args.lr_scheduler_type` Scheduler
@@ -76,23 +76,23 @@ def main():
             optimizer, total_num_steps=max_train_steps, warmup_num_steps=num_warmup_steps
         )
 
+
     model, optimizer, data, scheduler = accelerator.prepare(model, optimizer, data_loader, scheduler)
       
     
     global_bs = config["data"]['batch_size'] * accelerator.num_processes * accumulate_grad_batches
     
-    accelerator.init_trackers(project_name='llava-analysis', init_kwargs={"wandb": {"name": f"lr{lr}-gbs{global_bs}"}} )
+    accelerator.init_trackers(project_name='TEST', init_kwargs={"wandb": {"name": f"lr{lr}-gbs{global_bs}"}} )
     model.train()
-    # step = 2500 * accumulate_grad_batches
+
+
     step = 0
     for epoch in range(max_epochs):
         for batch in tqdm(data):
             step += 1
             with accelerator.accumulate(model):
-                if batch is None: continue
-                # if accelerator.is_main_process:
-                    # print(batch)
-                outputs = model(batch)
+                
+                outputs = model(**batch)
                 loss = outputs.loss
                 perplexity = torch.exp(loss)
                 accelerator.log({"loss":loss.item(), "perplexity":perplexity.item()})
@@ -101,40 +101,19 @@ def main():
                 optimizer.step()
                 scheduler.step()
                 optimizer.zero_grad()
-                if step % checkpoint_every_n_steps == 0:
-                    # accelerator.wait_for_everyone()
-                    # if accelerator.is_main_process:
-                        # print("Saving model")
-                    record_step = step // accumulate_grad_batches
-                    if os.path.exists(output_dir):
-                        pass
-                    else:
-                        os.makedirs(output_dir, exist_ok=True)
-                    unwrapped_model = accelerator.unwrap_model(model)
-                    torch.save(unwrapped_model.state_dict(), os.path.join(output_dir, f"{record_step}.pt"))
-                    
-                    # unwrapped_model.save_pretrained(
-                        # os.path.join(output_dir, f"{record_step}.pt"),
-                        # is_main_process=accelerator.is_main_process,
-                        # save_function=accelerator.save,
-                        # safe_serialization=False
-                    # )
-
-    unwrapped_model = accelerator.unwrap_model(model)
-    torch.save(unwrapped_model.state_dict(), os.path.join(output_dir, f"final.pt"))
-    # unwrapped_model.save_pretrained(
-    #     os.path.join(output_dir, f"final.pt"),
-    #     is_main_process=accelerator.is_main_process,
-    #     save_function=accelerator.save,
-    #     safe_serialization=False
-    # )
     
-    # accelerator.end_training() # added for the wandb logging to finish properly
-    # accelerator.save_state(os.path.join(output_dir, "accelerate_final"))
-
-
-
-
+    
+    
+    
+    unwrapped_model = accelerator.unwrap_model(model)
+    unwrapped_model.save_pretrained(
+        os.path.join(output_dir),
+        is_main_process=accelerator.is_main_process,
+        save_function=accelerator.save,
+        safe_serialization=False
+    )
+   
+   
 
 
 if __name__ == "__main__":

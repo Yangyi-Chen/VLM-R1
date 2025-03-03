@@ -1,0 +1,17 @@
+output_dir: data/ckpt/tabmwp
+
+
+data:
+  data_module: TabMWPModule
+  max_position_embeddings: 4096 # 5120
+  batch_size: 1
+  num_workers: 8
+
+
+
+training:
+  max_epochs: 1
+  accumulate_grad_batches: 128
+  weight_decay: 0.05
+  lr: 0.00001
+
