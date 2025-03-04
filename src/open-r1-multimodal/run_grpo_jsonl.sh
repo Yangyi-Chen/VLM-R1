@@ -1,12 +1,12 @@
 cd src/open-r1-multimodal
 
 export DEBUG_MODE="true"
-export CUDA_VISIBLE_DEVICES=3,4,6
+export CUDA_VISIBLE_DEVICES=1,2
 
 RUN_NAME="Qwen2.5-VL-3B-GRPO-tabmwp"
 export LOG_PATH="./debug_log_$RUN_NAME.txt"
 
-torchrun --nproc_per_node="3" \
+torchrun --nproc_per_node="2" \
     --nnodes="1" \
     --node_rank="0" \
     --master_addr="127.0.0.1" \
@@ -16,10 +16,10 @@ torchrun --nproc_per_node="3" \
     --output_dir output/$RUN_NAME \
     --model_name_or_path Qwen/Qwen2.5-VL-3B-Instruct \
     --dataset_name TabMWP \
-    --data_file_paths /shared/nas/data/m1/yangyic3/VLM-R1/VLM-R1/data/tabmwp/problems_train.jsonl \
-    --image_folders /shared/nas/data/m1/yangyic3/VLM-R1/VLM-R1/data/images  \
+    --data_file_paths /datadrive_a/tianyu/azure_storage/vigstandard_data/v-yangyi/data/data_files/tabmwp/problems_train.jsonl \
+    --image_folders /datadrive_a/tianyu/azure_storage/vigstandard_data/v-yangyi/data/images \
     --max_prompt_length 1024 \
-    --num_generations 3 \
+    --num_generations 4 \
     --per_device_train_batch_size 1 \
     --gradient_accumulation_steps 2 \
     --logging_steps 1 \

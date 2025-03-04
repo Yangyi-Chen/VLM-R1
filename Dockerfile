@@ -17,11 +17,13 @@ RUN pip install --no-cache-dir \
 
 # Install additional required packages
 RUN pip install \
+    torch \
     wandb==0.18.3 \
     tensorboardx \
     qwen_vl_utils \
     torchvision \
-    git+https://github.com/huggingface/transformers.git
+    transformers==4.49.0 \
+    babel
 
 # Copy local open-r1-multimodal repository
 COPY ./src/open-r1-multimodal /workspace/src/open-r1-multimodal

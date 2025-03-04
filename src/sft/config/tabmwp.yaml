@@ -10,8 +10,11 @@ data:
 
 
 training:
-  max_epochs: 1
+  max_epochs: 3
   accumulate_grad_batches: 128
   weight_decay: 0.05
   lr: 0.00001
 
+
+
+print()Sss
