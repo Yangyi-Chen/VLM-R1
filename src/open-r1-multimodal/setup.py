@@ -66,7 +66,8 @@ _deps = [
     "vllm==0.6.6.post1",
     "wandb>=0.19.1",
     "pillow",
-    "babel"
+    "babel",
+    "Levenshtein"
 ]
 
 # this is a lookup table with items like:
