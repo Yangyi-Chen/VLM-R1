@@ -237,6 +237,7 @@ def clean_text(text, exclue_chars=['\n', '\r']):
     return text.strip().rstrip('.').lower()
 
 def default_accuracy_reward(content, sol, **kwargs):
+    print("HERRE")
     reward = 0.0
     # Try symbolic verification first for numeric answers
     try:
@@ -260,22 +261,29 @@ def default_accuracy_reward(content, sol, **kwargs):
             # Check if ground truth contains numbers
             has_numbers = bool(re.search(r'\d', ground_truth))
             # Check if it's a multiple choice question
-            has_choices = extract_choice(ground_truth)
+            # has_choices = extract_choice(ground_truth)
             
             if has_numbers:
                 # For numeric answers, use exact matching
                 reward = numeric_reward(student_answer, ground_truth)
                 if reward is None:
-                    reward = ratio(clean_text(student_answer), clean_text(ground_truth))
-            elif has_choices:
-                # For multiple choice, extract and compare choices
-                correct_choice = has_choices.upper()
-                student_choice = extract_choice(student_answer)
-                if student_choice:
-                    reward = 1.0 if student_choice == correct_choice else 0.0
+                    reward = 0
+                # if reward is None:
+                #     reward = ratio(clean_text(student_answer), clean_text(ground_truth))
             else:
-                # For text answers, use fuzzy matching
-                reward = ratio(clean_text(student_answer), clean_text(ground_truth))
+                # text answers 
+                if ground_truth == student_answer or ground_truth in student_answer:
+                    reward = 1.0
+                
+            # elif has_choices:
+            #     # For multiple choice, extract and compare choices
+            #     correct_choice = has_choices.upper()
+            #     student_choice = extract_choice(student_answer)
+            #     if student_choice:
+            #         reward = 1.0 if student_choice == correct_choice else 0.0
+            # else:
+            #     # For text answers, use fuzzy matching
+            #     reward = ratio(clean_text(student_answer), clean_text(ground_truth))
         except Exception:
             pass  # Keep reward as 0.0 if all methods fail
 
