@@ -2,7 +2,7 @@ from accelerate import Accelerator
 import yaml
 import argparse
 from tqdm import tqdm
-import src.data
+import data
 import torch
 # LR scheduler
 import os
@@ -41,7 +41,7 @@ def main():
 
    
     data_module = getattr(
-        src.data, config["data"]["data_module"]
+        data, config["data"]["data_module"]
     )(config, processor)
     data_loader = data_module.train_dataloader()
     lr = config["training"]["lr"]
