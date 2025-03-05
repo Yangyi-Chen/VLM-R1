@@ -20,13 +20,14 @@ class TabMWPModule(BaseDataModule):
     class TabMWPDataset(torch.utils.data.Dataset):
         def __init__(self, config: dict, processor):
             self.config = config
-            self.tokenizer = tokenizer
             self.data_file_path = self.config["data"]["data_file"]
             self.image_folder = self.config["data"]["image_folder"]
             self.data_file = self.read_jsonl(self.data_file_path)
             for item in self.data_file:
                 item['image'] = os.path.join(self.image_folder, item['image'])
-        
+            self.processor = processor
+
+    
             
 
         def __len__(self):
@@ -64,11 +65,11 @@ class TabMWPModule(BaseDataModule):
             },
             {"role": "assistant", "content": sample["text_description"]}
         ]
-        text = processor.apply_chat_template(
+        text = self.processor.apply_chat_template(
                 messages, tokenize=False, add_generation_prompt=True
         )
         image_inputs, video_inputs = process_vision_info(messages)
-        inputs = processor(
+        inputs = self.processor(
             text=[text],
             images=image_inputs,
             videos=video_inputs,

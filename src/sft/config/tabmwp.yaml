@@ -6,15 +6,14 @@ data:
   max_position_embeddings: 4096 # 5120
   batch_size: 1
   num_workers: 8
+  data_file:  /blob/v-yangyi/data/data_files/tabmwp/problems_dev1k.jsonl
+  image_folder: /scratch/azureml/cr/j/f01af20a3317416d9343927e368a55a6/exe/wd/PromptPG/data/tabmwp/
 
 
 
 training:
-  max_epochs: 3
+  max_epochs: 1
   accumulate_grad_batches: 128
   weight_decay: 0.05
   lr: 0.00001
 
-
-
-print()Sss
