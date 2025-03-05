@@ -237,7 +237,6 @@ def clean_text(text, exclue_chars=['\n', '\r']):
     return text.strip().rstrip('.').lower()
 
 def default_accuracy_reward(content, sol, **kwargs):
-    print("HERRE")
     reward = 0.0
     # Try symbolic verification first for numeric answers
     try:
