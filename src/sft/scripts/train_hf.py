@@ -82,7 +82,7 @@ def main():
     
     global_bs = config["data"]['batch_size'] * accelerator.num_processes * accumulate_grad_batches
     
-    accelerator.init_trackers(project_name='TEST', init_kwargs={"wandb": {"name": f"lr{lr}-gbs{global_bs}"}} )
+    accelerator.init_trackers(project_name='SFT-INIT', init_kwargs={"wandb": {"name": config['wandb_name']}} )
     model.train()
 
 
