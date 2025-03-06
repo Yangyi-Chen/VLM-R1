@@ -97,10 +97,15 @@ class GRPOScriptArguments(ScriptArguments):
         default=0.0,
         metadata={"help": "Ratio of validation split, default 0.0"},
     )
+    # reward_funcs: list[str] = field(
+    #     default_factory=lambda: ["accuracy", "format"],
+    #     metadata={"help": "List of reward functions. Possible values: 'accuracy', 'format'"},
+    # )
     reward_funcs: list[str] = field(
-        default_factory=lambda: ["accuracy", "format"],
+        default_factory=lambda: ["accuracy"],
         metadata={"help": "List of reward functions. Possible values: 'accuracy', 'format'"},
     )
+
     max_pixels: Optional[int] = field(
         default=12845056,
         metadata={"help": "Maximum number of pixels for the image"},
