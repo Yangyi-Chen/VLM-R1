@@ -110,7 +110,14 @@ def main():
         os.path.join(output_dir),
         is_main_process=accelerator.is_main_process,
         save_function=accelerator.save,
-        safe_serialization=False
+        safe_serialization=True
+    )
+    # Save the tokenizer
+    processor.save_pretrained(
+        os.path.join(output_dir),
+        is_main_process=accelerator.is_main_process,
+        save_function=accelerator.save,
+        safe_serialization=True
     )
    
    
