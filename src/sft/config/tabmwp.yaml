@@ -1,4 +1,4 @@
-output_dir: ckpt/sft_tabmwp_imagedescribe
+output_dir:  data/ckpt/sft_tabmwp_imagedescribe
 
 wandb_name: sft_tabmwp_imagedescribe
 

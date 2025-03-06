@@ -62,7 +62,7 @@ class TabMWPModule(BaseDataModule):
                     {"type": "text", "text": "Describe this image."},
                 ],
             },
-            {"role": "assistant", "content": sample["text_description"]}
+            {"role": "assistant", "content": "<answer> " + sample["text_description"] + " </answer> "}
         ]
         text = self.processor.apply_chat_template(
                 messages, tokenize=False, add_generation_prompt=True

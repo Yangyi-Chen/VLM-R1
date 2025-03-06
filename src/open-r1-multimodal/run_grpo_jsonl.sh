@@ -3,7 +3,7 @@ cd src/open-r1-multimodal
 export DEBUG_MODE="true"
 export CUDA_VISIBLE_DEVICES=1,2,3,4,5,6,7
 
-RUN_NAME="Qwen2.5-VL-3B-GRPO-tabmwp-test12"
+RUN_NAME="Qwen2.5-VL-3B-GRPO-tabmwp-description"
 export LOG_PATH="./debug_log_$RUN_NAME.txt"
 
 torchrun --nproc_per_node="7" \
@@ -32,7 +32,8 @@ torchrun --nproc_per_node="7" \
     --num_train_epochs 1 \
     --run_name $RUN_NAME \
     --save_steps 100 \
-    --save_only_model true
+    --save_only_model true \
+    --reward_method description
 
 # original num generiaon = 8
 # rec_jsons_processed/refcoco_train.jsonl \

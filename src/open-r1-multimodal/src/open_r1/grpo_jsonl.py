@@ -293,6 +293,14 @@ def default_accuracy_reward(content, sol, **kwargs):
 
     return reward
 
+
+def text_description_overlap(content, sol, **kwargs):
+    content = clean_text(content)
+    sol = clean_text(sol)
+    return ratio(content, sol)
+
+
+
 def accuracy_reward(completions, solution, **kwargs):
     """Reward function that checks if the completion is correct using symbolic verification, exact string matching, or fuzzy matching."""
     contents = [completion[0]["content"] for completion in completions]
@@ -303,6 +311,8 @@ def accuracy_reward(completions, solution, **kwargs):
             reward = mcq_reward(content, sol)
         elif accu_reward_method == 'yes_no':
             reward = yes_no_reward(content, sol)
+        elif accu_reward_method == 'description':
+            reward = text_description_overlap(content, sol)
         else:
             reward = default_accuracy_reward(content, sol)  
         rewards.append(reward)
@@ -347,12 +357,12 @@ reward_funcs_registry = {
     "format": format_reward,
 }
 
-SYSTEM_PROMPT = (
-    "A conversation between User and Assistant. The user asks a question, and the Assistant solves it. The assistant "
-    "first thinks about the reasoning process in the mind and then provides the user with the answer. The reasoning "
-    "process and answer are enclosed within <think> </think> and <answer> </answer> tags, respectively, i.e., "
-    "<think> reasoning process here </think><answer> answer here </answer>"
-)
+# SYSTEM_PROMPT = (
+#     "A conversation between User and Assistant. The user asks a question, and the Assistant solves it. The assistant "
+#     "first thinks about the reasoning process in the mind and then provides the user with the answer. The reasoning "
+#     "process and answer are enclosed within <think> </think> and <answer> </answer> tags, respectively, i.e., "
+#     "<think> reasoning process here </think><answer> answer here </answer>"
+# )
 
 
 def main(script_args, training_args, model_args):
@@ -416,7 +426,7 @@ def main(script_args, training_args, model_args):
                 'role': 'user',
                 'content': [
                     {'type': 'image', 'text': None},
-                    {'type': 'text', 'text': example['problem'] + '  Output the thinking process in <think> </think> and final answer in <answer> </answer> tags.'}
+                    {'type': 'text', 'text': example['problem']}  # + '  Output the thinking process in <think> </think> and final answer in <answer> </answer> tags.'
                 ]
             }]
         }
