@@ -19,7 +19,7 @@ torchrun --nproc_per_node="7" \
     --data_file_paths /blob/v-yangyi/data/data_files/tabmwp/problems_train.jsonl \
     --image_folders /scratch/azureml/cr/j/f01af20a3317416d9343927e368a55a6/exe/wd/PromptPG/data/tabmwp/ \
     --max_prompt_length 1024 \
-    --num_generations 14 \
+    --num_generations 7 \
     --per_device_train_batch_size 1 \
     --gradient_accumulation_steps 2 \
     --logging_steps 1 \
@@ -29,7 +29,7 @@ torchrun --nproc_per_node="7" \
     --report_to wandb \
     --gradient_checkpointing false \
     --attn_implementation flash_attention_2 \
-    --num_train_epochs 2 \
+    --num_train_epochs 1 \
     --run_name $RUN_NAME \
     --save_steps 100 \
     --save_only_model true
