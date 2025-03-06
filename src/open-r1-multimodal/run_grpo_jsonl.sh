@@ -14,9 +14,9 @@ torchrun --nproc_per_node="7" \
     src/open_r1/grpo_jsonl.py \
     --deepspeed local_scripts/zero3.json \
     --output_dir output/$RUN_NAME \
-    --model_name_or_path  ../data/ckpt/sft_tabmwp_imagedescribe \
+    --model_name_or_path  ../../data/ckpt/sft_tabmwp_imagedescribe \
     --dataset_name TabMWP \
-    --data_file_paths ../data/tabmwp/rl_describe.jsonl \
+    --data_file_paths ../../data/tabmwp/rl_describe.jsonl \
     --image_folders /scratch/azureml/cr/j/f01af20a3317416d9343927e368a55a6/exe/wd/PromptPG/data/tabmwp/ \
     --max_prompt_length 1024 \
     --num_generations 7 \
