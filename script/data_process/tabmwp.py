@@ -6,7 +6,7 @@ import os
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument("--parse_type", type=str)
-parser.add_argument("--data_file_dir", type=str)
+parser.add_argument("--data_file_dir", type=str, default="/blob/v-yangyi/data/data_files/tabmwp/")
 args = parser.parse_args()
 
 
