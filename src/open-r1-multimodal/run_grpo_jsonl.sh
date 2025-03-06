@@ -3,7 +3,7 @@ cd src/open-r1-multimodal
 export DEBUG_MODE="true"
 export CUDA_VISIBLE_DEVICES=1,2,3,4,5,6,7
 
-RUN_NAME="Qwen2.5-VL-3B-GRPO-tabmwp-test1"
+RUN_NAME="Qwen2.5-VL-3B-GRPO-tabmwp-test12"
 export LOG_PATH="./debug_log_$RUN_NAME.txt"
 
 torchrun --nproc_per_node="7" \
