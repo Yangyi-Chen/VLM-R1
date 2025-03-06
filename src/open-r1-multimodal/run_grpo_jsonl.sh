@@ -14,7 +14,7 @@ torchrun --nproc_per_node="7" \
     src/open_r1/grpo_jsonl.py \
     --deepspeed local_scripts/zero3.json \
     --output_dir output/$RUN_NAME \
-    --model_name_or_path  ../../data/ckpt/sft_tabmwp_imagedescribe \
+    --model_name_or_path  Qwen/Qwen2.5-VL-3B-Instruct \
     --dataset_name TabMWP \
     --data_file_paths ../../data/tabmwp/rl_describe.jsonl \
     --image_folders /scratch/azureml/cr/j/f01af20a3317416d9343927e368a55a6/exe/wd/PromptPG/data/tabmwp/ \
@@ -37,4 +37,4 @@ torchrun --nproc_per_node="7" \
 
 # original num generiaon = 8
 # rec_jsons_processed/refcoco_train.jsonl \
-# Qwen/Qwen2.5-VL-3B-Instruct
+# Qwen/Qwen2.5-VL-3B-Instruct  ../../data/ckpt/sft_tabmwp_imagedescribe
