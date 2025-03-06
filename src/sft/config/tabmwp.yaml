@@ -7,7 +7,7 @@ data:
   max_position_embeddings: 8192
   batch_size: 1
   num_workers: 8
-  data_file:  /blob/v-yangyi/data/data_files/tabmwp/problems_dev1k.jsonl
+  data_file: data/tabmwp/sft_describe.jsonl
   image_folder: /scratch/azureml/cr/j/f01af20a3317416d9343927e368a55a6/exe/wd/PromptPG/data/tabmwp/
 
 

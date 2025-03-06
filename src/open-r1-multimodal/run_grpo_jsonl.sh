@@ -16,7 +16,7 @@ torchrun --nproc_per_node="7" \
     --output_dir output/$RUN_NAME \
     --model_name_or_path Qwen/Qwen2.5-VL-3B-Instruct \
     --dataset_name TabMWP \
-    --data_file_paths /blob/v-yangyi/data/data_files/tabmwp/problems_train.jsonl \
+    --data_file_paths data/tabmwp/rl_describe.jsonl \
     --image_folders /scratch/azureml/cr/j/f01af20a3317416d9343927e368a55a6/exe/wd/PromptPG/data/tabmwp/ \
     --max_prompt_length 1024 \
     --num_generations 7 \

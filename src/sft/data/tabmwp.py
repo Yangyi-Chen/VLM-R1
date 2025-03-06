@@ -51,7 +51,6 @@ class TabMWPModule(BaseDataModule):
     def collate_fn(self, batch):
         assert len(batch) == 1
         sample = batch[0]
-        
         messages = [
             {
                 "role": "user",
