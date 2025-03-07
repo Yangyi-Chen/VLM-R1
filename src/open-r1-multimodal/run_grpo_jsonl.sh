@@ -3,7 +3,7 @@ cd src/open-r1-multimodal
 export DEBUG_MODE="true"
 export CUDA_VISIBLE_DEVICES=1,2,3,4,5,6,7
 
-RUN_NAME="Qwen2.5-VL-3B-GRPO-tabmwp-description"
+RUN_NAME="Qwen2.5-VL-3B-GRPO-tabmwp-description-ref"
 export LOG_PATH="./debug_log_$RUN_NAME.txt"
 
 torchrun --nproc_per_node="7" \
@@ -14,7 +14,7 @@ torchrun --nproc_per_node="7" \
     src/open_r1/grpo_jsonl.py \
     --deepspeed local_scripts/zero3.json \
     --output_dir output/$RUN_NAME \
-    --model_name_or_path  ../../data/ckpt/Qwen2.5-VL_sft_tabmwp_imagedescribe  \
+    --model_name_or_path  Qwen/Qwen2.5-VL-3B-Instruct  \
     --dataset_name TabMWP \
     --data_file_paths ../../data/tabmwp/rl_describe.jsonl \
     --image_folders /scratch/azureml/cr/j/f01af20a3317416d9343927e368a55a6/exe/wd/PromptPG/data/tabmwp/ \
