@@ -64,7 +64,7 @@ elif parse_type == "sft_reason":
         image = "tables/" + k + ".png"
         conversations = [
             {'from': 'human', 'value': "<image>"+ item['question']},
-            {'from': 'gpt', 'value': "<image> " + item['table'] + " </image>\n" + item['solution'] + '\n' + "<answer> " + item['answer'] + " </answer>"}
+            {'from': 'gpt', 'value': "<visual> " + item['table'] + " </visual>\n" + item['solution'] + '\n' + "<answer> " + item['answer'] + " </answer>"}
         ]
         save_data.append({'id': count, 'image': image, 'conversations': conversations, 'cot': item['solution'], 'text_description': str(item['table'])})
         count += 1
@@ -101,6 +101,28 @@ elif parse_type == "rl_describe":
 
 
 elif parse_type == "rl_reason":
-    pass
+    input_path = "problems_train.json"
+    input_path = os.path.join(data_file_dir, input_path)
+    output_path = os.path.join("data", "tabmwp", "rl_reason.jsonl")
+
+    src_data = read_json(input_path)
+
+    save_data = []
+    count = 0
+    for k, item in src_data.items():
+        image = "tables/" + k + ".png"
+        conversations = [
+            {'from': 'human', 'value': "<image>"+ item['question']},
+            {'from': 'gpt', 'value': item['answer']}
+        ]
+
+        save_data.append({'id': count, 'image': image, "conversations": conversations, 'solution' : item['answer']})
+        count += 1
+    # check if the directory exists, if not create it
+    if not os.path.exists(os.path.dirname(output_path)):
+        os.makedirs(os.path.dirname(output_path))
+    write_jsonl(output_path, save_data)
+
+
 else:
     raise ValueError("Invalid parse type")
