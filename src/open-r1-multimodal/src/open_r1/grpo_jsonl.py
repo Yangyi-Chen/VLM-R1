@@ -97,14 +97,14 @@ class GRPOScriptArguments(ScriptArguments):
         default=0.0,
         metadata={"help": "Ratio of validation split, default 0.0"},
     )
-    # reward_funcs: list[str] = field(
-    #     default_factory=lambda: ["accuracy", "format"],
-    #     metadata={"help": "List of reward functions. Possible values: 'accuracy', 'format'"},
-    # )
     reward_funcs: list[str] = field(
-        default_factory=lambda: ["accuracy"],
+        default_factory=lambda: ["accuracy", "format"],
         metadata={"help": "List of reward functions. Possible values: 'accuracy', 'format'"},
     )
+    # reward_funcs: list[str] = field(
+    #     default_factory=lambda: ["accuracy"],
+    #     metadata={"help": "List of reward functions. Possible values: 'accuracy', 'format'"},
+    # )
 
     max_pixels: Optional[int] = field(
         default=12845056,
@@ -335,8 +335,10 @@ def accuracy_reward(completions, solution, **kwargs):
 
 
 def format_reward(completions, **kwargs):
+
     """Reward function that checks if the completion has a specific format."""
-    pattern = r"<think>.*?</think>\s*<answer>.*?</answer>"
+    # pattern = r"<think>.*?</think>\s*<answer>.*?</answer>"
+    pattern = r"<visual>.*?</visual>(.*?)<answer>.*?</answer>"
     completion_contents = [completion[0]["content"] for completion in completions]
     matches = [re.fullmatch(pattern, content, re.DOTALL) for content in completion_contents]
 

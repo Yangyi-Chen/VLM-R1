@@ -33,6 +33,7 @@ torchrun --nproc_per_node="7" \
     --run_name $RUN_NAME \
     --save_steps 100 \
     --save_only_model true \
+    --reward_funcs accuracy format 
 
 # original num generiaon = 8
 # rec_jsons_processed/refcoco_train.jsonl \
