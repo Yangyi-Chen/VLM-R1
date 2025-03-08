@@ -86,7 +86,7 @@ def batch_generate(test_data, processor, model, image_folder, batch_size):
             # Store the result
             results[k] = output_text
             print(f"Key: {k}, Output: {output_text[:100]}...")  # Print truncated output
-        print(results[0])
+
     return results
 
 
