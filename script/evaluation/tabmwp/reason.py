@@ -8,6 +8,97 @@ import torch
 from typing import Optional, Tuple
 from Levenshtein import ratio
 from statistics import mean as average
+import re
+from math_verify import parse, verify
+
+
+def clean_text(text, exclue_chars=['\n', '\r']):
+    # Extract content between <answer> and </answer> if present
+    answer_matches = re.findall(r'<{answer}>(.*?)</answer>', text, re.DOTALL)
+    if answer_matches:
+        # Use the last match
+        text = answer_matches[-1]
+    
+    for char in exclue_chars:
+        if char in ['\n', '\r']:
+            # If there is a space before the newline, remove the newline
+            text = re.sub(r'(?<=\s)' + re.escape(char), '', text)
+            # If there is no space before the newline, replace it with a space
+            text = re.sub(r'(?<!\s)' + re.escape(char), ' ', text)
+        else:
+            text = text.replace(char, ' ')
+    
+    # Remove leading and trailing spaces and convert to lowercase
+    return text.strip().rstrip('.').lower()
+
+
+def numeric_reward(content, sol, **kwargs):
+    content = clean_text(content)
+    sol = clean_text(sol)
+    try:
+        content, sol = float(content), float(sol)
+        return 1.0 if content == sol else 0.0
+    except:
+        return None
+
+
+
+
+def default_accuracy_reward(content, sol, **kwargs):
+    reward = 0.0
+    # Try symbolic verification first for numeric answers
+    try:
+        answer = parse(content)
+        if float(verify(answer, parse(sol))) > 0:
+            reward = 1.0
+    except Exception:
+        pass  # Continue to next verification method if this fails
+    
+    # If symbolic verification failed, try string matching or fuzzy matching
+    if reward == 0.0:
+        try:
+            # Extract answer from solution if it has think/answer tags
+            sol_match = re.search(r'<answer>(.*?)</answer>', sol)
+            ground_truth = sol_match.group(1).strip() if sol_match else sol.strip()
+            
+            # Extract answer from content if it has think/answer tags
+            content_matches = re.findall(r'<answer>(.*?)</answer>', content, re.DOTALL)
+            student_answer = content_matches[-1].strip() if content_matches else content.strip()
+            
+            # Check if ground truth contains numbers
+            has_numbers = bool(re.search(r'\d', ground_truth))
+            # Check if it's a multiple choice question
+            # has_choices = extract_choice(ground_truth)
+            
+            if has_numbers:
+                # For numeric answers, use exact matching
+                reward = numeric_reward(student_answer, ground_truth)
+                if reward is None:
+                    reward = 0
+                # if reward is None:
+                #     reward = ratio(clean_text(student_answer), clean_text(ground_truth))
+            else:
+                # text answers 
+                if ground_truth == student_answer or ground_truth in student_answer:
+                    reward = 1.0
+                
+            # elif has_choices:
+            #     # For multiple choice, extract and compare choices
+            #     correct_choice = has_choices.upper()
+            #     student_choice = extract_choice(student_answer)
+            #     if student_choice:
+            #         reward = 1.0 if student_choice == correct_choice else 0.0
+            # else:
+            #     # For text answers, use fuzzy matching
+            #     reward = ratio(clean_text(student_answer), clean_text(ground_truth))
+        except Exception:
+            pass  # Keep reward as 0.0 if all methods fail
+
+    return reward
+
+
+
+
 
 def batch_generate(test_data, processor, model, image_folder, batch_size):
     # Get all test keys
@@ -31,12 +122,12 @@ def batch_generate(test_data, processor, model, image_folder, batch_size):
                             "type": "image",
                             "image": image_path,
                         },
-                        {"type": "text", "text": "<image>Describe this image."},
+                        {"type": "text", "text": "<image>" + test_data[k]['question']},
                     ],
                 }
             ]
             batch_messages.append(messages)
-            target_list.append(test_data[k]["table"])
+            target_list.append(test_data[k]["answer"])
 
         
         # Process batch
@@ -87,10 +178,13 @@ def batch_generate(test_data, processor, model, image_folder, batch_size):
             )[0]
             
             # Store the result
-            
+            metric = default_accuracy_reward(output_text, target_list[j])
             # compute the metric
-            metric_list.append(ratio(output_text, target_list[j]))
+            metric_list.append(metric)
+            print("M: ", metric)
+        
         print(average(metric_list))
+    
     return average(metric_list)
 
 
@@ -103,7 +197,6 @@ def read_json(path):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Process some integers.')
-    parser.add_argument("--template", type=str, default="answer")
     parser.add_argument("--model_path", type=str, default="Qwen/Qwen2.5-VL-3B-Instruct")
     parser.add_argument("--batch_size", type=int, default=8)
     args = parser.parse_args()
