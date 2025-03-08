@@ -26,7 +26,7 @@ if __name__ == "__main__":
 
 
 
-    model = Qwen2_5_VLForConditionalGeneration.from_pretrained(model_path, cache_dir="./")
+    model = Qwen2_5_VLForConditionalGeneration.from_pretrained(model_path, cache_dir="./").cuda()
     processor = AutoProcessor.from_pretrained("Qwen/Qwen2.5-VL-3B-Instruct")
 
     test_data = read_json("/blob/v-yangyi/data/data_files/tabmwp/problems_test1k.json")
