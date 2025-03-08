@@ -90,7 +90,7 @@ def batch_generate(test_data, processor, model, image_folder, batch_size):
             
             # compute the metric
             metric_list.append(ratio(output_text, target_list[j]))
-    
+        print(average(metric_list))
     return average(metric_list)
 
 
