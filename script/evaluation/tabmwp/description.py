@@ -22,7 +22,7 @@ if __name__ == "__main__":
     template = args.template
     model_path = args.model_path
 
-    IMAGE_FOLDER = "/scratch/azureml/cr/j/f01af20a3317416d9343927e368a55a6/exe/wd/PromptPG/data/tabmwp/"
+    IMAGE_FOLDER = "/scratch/azureml/cr/j/f01af20a3317416d9343927e368a55a6/exe/wd/PromptPG/data/tabmwp/tables"
 
 
 
