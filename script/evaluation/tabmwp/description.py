@@ -4,7 +4,6 @@ from transformers import Qwen2_5_VLForConditionalGeneration, AutoProcessor
 import json
 from qwen_vl_utils import process_vision_info
 from tqdm import tqdm
-from transformers.models.qwen2_5_vl.modeling_qwen2_5_vl import Qwen2_5_VLVisionFlashAttention2, apply_rotary_pos_emb_flashatt, flash_attn_varlen_func
 import torch
 from typing import Optional, Tuple
 
@@ -68,7 +67,7 @@ def batch_generate(test_data, processor, model, image_folder, batch_size):
             generated_ids = model.generate(**inputs, max_new_tokens=1280)
         
         # Process outputs for each item in the batch
-        for j, k in enumerate(batch_keys):
+        for j, k in enumerate(tqdm(batch_keys)):
             # Get the input and output IDs for this batch item
             in_ids = inputs.input_ids[j]
             out_ids = generated_ids[j]
