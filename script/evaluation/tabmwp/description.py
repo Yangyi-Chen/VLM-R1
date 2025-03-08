@@ -6,19 +6,20 @@ from qwen_vl_utils import process_vision_info
 from tqdm import tqdm
 import torch
 from typing import Optional, Tuple
-
-
+from Levenshtein import ratio
+from statistics import mean as average
 
 def batch_generate(test_data, processor, model, image_folder, batch_size):
     # Get all test keys
     all_keys = list(test_data.keys())
-    results = {}
-    
+
+    metric_list = []
     # Process in batches
-    for i in range(0, len(all_keys), batch_size):
+    for i in tqdm(range(0, len(all_keys), batch_size)):
         batch_keys = all_keys[i:i+batch_size]
         batch_messages = []
-        
+        target_list = []
+
         # Prepare batch inputs
         for k in batch_keys:
             image_path = os.path.join(image_folder, k + ".png")
@@ -35,6 +36,8 @@ def batch_generate(test_data, processor, model, image_folder, batch_size):
                 }
             ]
             batch_messages.append(messages)
+            target_list.append(test_data[k]["table"])
+
         
         # Process batch
         batch_text = []
@@ -65,9 +68,10 @@ def batch_generate(test_data, processor, model, image_folder, batch_size):
         # Generate for the whole batch
         with torch.no_grad():  # Add this to save memory during inference
             generated_ids = model.generate(**inputs, max_new_tokens=1280)
-        
+
+
         # Process outputs for each item in the batch
-        for j, k in enumerate(tqdm(batch_keys)):
+        for j, k in enumerate(batch_keys):
             # Get the input and output IDs for this batch item
             in_ids = inputs.input_ids[j]
             out_ids = generated_ids[j]
@@ -83,10 +87,11 @@ def batch_generate(test_data, processor, model, image_folder, batch_size):
             )[0]
             
             # Store the result
-            results[k] = output_text
-            print(f"Key: {k}, Output: {output_text[:100]}...")  # Print truncated output
-
-    return results
+            
+            # compute the metric
+            metric_list.append(ratio(output_text, target_list[j]))
+    
+    return average(metric_list)
 
 
 
@@ -117,12 +122,14 @@ if __name__ == "__main__":
 
     test_data = read_json("/blob/v-yangyi/data/data_files/tabmwp/problems_test1k.json")
 
-    outputs = batch_generate(
+    metric = batch_generate(
         test_data=test_data,
         processor=processor,
         model=model,
         image_folder=IMAGE_FOLDER,
         batch_size=BATCH_SIZE,
     )
+    print(metric)
+
 
    
