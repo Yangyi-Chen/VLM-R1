@@ -59,6 +59,7 @@ def batch_generate(test_data, processor, model, image_folder, batch_size):
             videos=None,
             padding=True,
             return_tensors="pt",
+            padding_side="left"
         )
         inputs = inputs.to("cuda")
         
