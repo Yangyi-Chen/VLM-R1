@@ -67,7 +67,7 @@ def batch_generate(test_data, processor, model, image_folder, batch_size):
         
         # Generate for the whole batch
         with torch.no_grad():  # Add this to save memory during inference
-            generated_ids = model.generate(**inputs, max_new_tokens=1280)
+            generated_ids = model.generate(**inputs, use_cache=True, max_new_tokens=256, do_sample=False)
 
 
         # Process outputs for each item in the batch
