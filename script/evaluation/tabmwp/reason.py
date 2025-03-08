@@ -8,33 +8,6 @@ import torch
 from typing import Optional, Tuple
 from Levenshtein import ratio
 from statistics import mean as average
-import re
-
-def clean_text(text, exclue_chars=['\n', '\r']):
-    # Extract content between <answer> and </answer> if present
-    if template == 'answer':
-        answer_matches = re.findall(r'<{answer}>(.*?)</answer>', text, re.DOTALL)
-    elif template == 'visual':
-        answer_matches = re.findall(r'<{visual}>(.*?)</visual>', text, re.DOTALL)
-    else:
-        raise ValueError(f"Unknown template: {template}")
-    if answer_matches:
-        # Use the last match
-        text = answer_matches[-1]
-    
-    for char in exclue_chars:
-        if char in ['\n', '\r']:
-            # If there is a space before the newline, remove the newline
-            text = re.sub(r'(?<=\s)' + re.escape(char), '', text)
-            # If there is no space before the newline, replace it with a space
-            text = re.sub(r'(?<!\s)' + re.escape(char), ' ', text)
-        else:
-            text = text.replace(char, ' ')
-    
-    # Remove leading and trailing spaces and convert to lowercase
-    return text.strip().rstrip('.').lower()
-
-
 
 def batch_generate(test_data, processor, model, image_folder, batch_size):
     # Get all test keys
@@ -114,7 +87,7 @@ def batch_generate(test_data, processor, model, image_folder, batch_size):
             )[0]
             
             # Store the result
-            output_text = clean_text(output_text)
+            
             # compute the metric
             metric_list.append(ratio(output_text, target_list[j]))
         print(average(metric_list))
