@@ -40,7 +40,7 @@ def batch_generate(test_data, processor, model, image_folder, batch_size):
         # Process batch
         batch_text = []
         batch_image_inputs = []
-        batch_video_inputs = []
+        # batch_video_inputs = []
         
         for messages in batch_messages:
             text = processor.apply_chat_template(
@@ -50,13 +50,13 @@ def batch_generate(test_data, processor, model, image_folder, batch_size):
             
             batch_text.append(text)
             batch_image_inputs.extend(image_inputs)
-            batch_video_inputs.extend(video_inputs)
+            # batch_video_inputs.extend(video_inputs)
         
         # Create inputs for the whole batch
         inputs = processor(
             text=batch_text,
             images=batch_image_inputs,
-            videos=batch_video_inputs,
+            videos=None,
             padding=True,
             return_tensors="pt",
         )
