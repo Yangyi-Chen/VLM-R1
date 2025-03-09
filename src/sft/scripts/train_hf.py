@@ -37,7 +37,8 @@ def main():
         model = Qwen2_5_VLForConditionalGeneration.from_pretrained(resume)
     else:
          # load model and data, optimizer
-        model = Qwen2_5_VLForConditionalGeneration.from_pretrained("Qwen/Qwen2.5-VL-3B-Instruct", cache_dir="./")
+         print("Loading model. init from Qwen2.5-VL-3B-Instruct")
+         model = Qwen2_5_VLForConditionalGeneration.from_pretrained("Qwen/Qwen2.5-VL-3B-Instruct", cache_dir="./")
     processor = AutoProcessor.from_pretrained("Qwen/Qwen2.5-VL-3B-Instruct")
     
     
