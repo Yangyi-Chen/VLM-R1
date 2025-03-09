@@ -30,7 +30,7 @@ def main():
     accumulate_grad_batches = config["training"]["accumulate_grad_batches"]
     output_dir = config['output_dir']
     record = config['training']['record_middle']
-    resume = config.get('resume', None)
+    resume = config['training'].get('resume', None)
 
     if resume is not None:
         print(f"Resuming from {resume}")
