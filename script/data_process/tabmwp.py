@@ -50,6 +50,30 @@ if parse_type == 'sft_describe':
     if not os.path.exists(os.path.dirname(output_path)):
         os.makedirs(os.path.dirname(output_path))
     write_jsonl(output_path, save_data)
+elif parse_type == "sft_describe_ref":
+    input_path = "problems_train.json"
+    input_path = os.path.join(data_file_dir, input_path)
+    output_path = os.path.join("data", "tabmwp", "sft_describe_ref.jsonl")
+
+    src_data = read_json(input_path)
+
+    save_data = []
+    count = 0
+    for k, item in src_data.items():
+        image = "tables/" + k + ".png"
+        conversations = [
+            {'from': 'human', 'value': "<image>"+ "Describe this image."},
+            {'from': 'gpt', 'value': "<answer> " + item['table'] + " </answer>"}
+        ]
+
+        save_data.append({'id': count, 'image': image, 'conversations': conversations, 'cot': item['solution'], 'text_description': str(item['table'])})
+        count += 1
+    # check if the directory exists, if not create it
+    if not os.path.exists(os.path.dirname(output_path)):
+        os.makedirs(os.path.dirname(output_path))
+    write_jsonl(output_path, save_data)
+
+
 
 elif parse_type == "sft_reason":
     input_path = "problems_dev1k.json"
@@ -74,6 +98,27 @@ elif parse_type == "sft_reason":
     write_jsonl(output_path, save_data)
 
 
+elif parse_type == "sft_reason_ref":
+    input_path = "problems_train.json"
+    input_path = os.path.join(data_file_dir, input_path)
+    output_path = os.path.join("data", "tabmwp", "sft_reason_ref.jsonl")
+
+    src_data = read_json(input_path)
+
+    save_data = []
+    count = 0
+    for k, item in src_data.items():
+        image = "tables/" + k + ".png"
+        conversations = [
+            {'from': 'human', 'value': "<image>"+ item['question']},
+            {'from': 'gpt', 'value': "<visual> " + item['table'] + " </visual>\n" + item['solution'] + '\n' + "<answer> " + item['answer'] + " </answer>"}
+        ]
+        save_data.append({'id': count, 'image': image, 'conversations': conversations, 'cot': item['solution'], 'text_description': str(item['table'])})
+        count += 1
+    # check if the directory exists, if not create it
+    if not os.path.exists(os.path.dirname(output_path)):
+        os.makedirs(os.path.dirname(output_path))
+    write_jsonl(output_path, save_data)
 
 
 elif parse_type == "rl_describe":

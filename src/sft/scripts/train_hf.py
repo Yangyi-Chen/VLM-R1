@@ -29,7 +29,7 @@ def main():
     max_epochs = config["training"]["max_epochs"]
     accumulate_grad_batches = config["training"]["accumulate_grad_batches"]
     output_dir = config['output_dir']
-    
+    record = config['training']['record']
     
     # load model and data, optimizer
     model = Qwen2_5_VLForConditionalGeneration.from_pretrained("Qwen/Qwen2.5-VL-3B-Instruct", cache_dir="./")
@@ -101,26 +101,44 @@ def main():
                 optimizer.step()
                 scheduler.step()
                 optimizer.zero_grad()
-    
-    
-    
+            
+
+            if (step % 100 == 0) and record:
+                # save an intermediate model
+                unwrapped_model = accelerator.unwrap_model(model)
+                unwrapped_model.save_pretrained(
+                    os.path.join(output_dir, f"intermediate_{step}"),
+                    is_main_process=accelerator.is_main_process,
+                    save_function=accelerator.save,
+                    safe_serialization=True
+                )
+                # Save the tokenizer
+                processor.save_pretrained(
+                    os.path.join(output_dir, f"intermediate_{step}"),
+                    is_main_process=accelerator.is_main_process,
+                    save_function=accelerator.save,
+                    safe_serialization=True
+                )
+
     
     unwrapped_model = accelerator.unwrap_model(model)
+    tgt_path = os.path.join(output_dir, "final") if record else output_dir
+        
     unwrapped_model.save_pretrained(
-        os.path.join(output_dir),
+        tgt_path,
         is_main_process=accelerator.is_main_process,
         save_function=accelerator.save,
         safe_serialization=True
     )
     # Save the tokenizer
     processor.save_pretrained(
-        os.path.join(output_dir),
+        tgt_path,
         is_main_process=accelerator.is_main_process,
         save_function=accelerator.save,
         safe_serialization=True
     )
-   
-   
+
+
 
 
 if __name__ == "__main__":
