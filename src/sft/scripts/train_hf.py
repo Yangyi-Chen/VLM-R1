@@ -125,7 +125,8 @@ def main():
                     save_function=accelerator.save,
                     safe_serialization=True
                 )
-
+            if step >= 3000:
+                break
     
     unwrapped_model = accelerator.unwrap_model(model)
     tgt_path = os.path.join(output_dir, "final") if record else output_dir
