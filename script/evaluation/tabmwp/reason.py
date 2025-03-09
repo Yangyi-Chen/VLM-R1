@@ -14,7 +14,7 @@ from math_verify import parse, verify
 
 def clean_text(text, exclue_chars=['\n', '\r']):
     # Extract content between <answer> and </answer> if present
-    answer_matches = re.findall(r'<{answer}>(.*?)</answer>', text, re.DOTALL)
+    answer_matches = re.findall(r'<answer>(.*?)</answer>', text, re.DOTALL)
     if answer_matches:
         # Use the last match
         text = answer_matches[-1]
