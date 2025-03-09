@@ -181,7 +181,6 @@ def batch_generate(test_data, processor, model, image_folder, batch_size):
             metric = default_accuracy_reward(output_text, target_list[j])
             # compute the metric
             metric_list.append(metric)
-            print("M: ", metric)
         
         print(average(metric_list))
     
