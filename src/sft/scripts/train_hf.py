@@ -29,7 +29,7 @@ def main():
     max_epochs = config["training"]["max_epochs"]
     accumulate_grad_batches = config["training"]["accumulate_grad_batches"]
     output_dir = config['output_dir']
-    record = config['training']['record']
+    record = config['training']['record_middle']
     
     # load model and data, optimizer
     model = Qwen2_5_VLForConditionalGeneration.from_pretrained("Qwen/Qwen2.5-VL-3B-Instruct", cache_dir="./")
