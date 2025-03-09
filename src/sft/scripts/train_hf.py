@@ -30,9 +30,13 @@ def main():
     accumulate_grad_batches = config["training"]["accumulate_grad_batches"]
     output_dir = config['output_dir']
     record = config['training']['record_middle']
-    
-    # load model and data, optimizer
-    model = Qwen2_5_VLForConditionalGeneration.from_pretrained("Qwen/Qwen2.5-VL-3B-Instruct", cache_dir="./")
+    resume = config.get('resume', None)
+
+    if resume is not None:
+        model = Qwen2_5_VLForConditionalGeneration.from_pretrained(resume)
+    else:
+         # load model and data, optimizer
+        model = Qwen2_5_VLForConditionalGeneration.from_pretrained("Qwen/Qwen2.5-VL-3B-Instruct", cache_dir="./")
     processor = AutoProcessor.from_pretrained("Qwen/Qwen2.5-VL-3B-Instruct")
     
     
