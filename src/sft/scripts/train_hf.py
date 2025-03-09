@@ -33,6 +33,7 @@ def main():
     resume = config.get('resume', None)
 
     if resume is not None:
+        print(f"Resuming from {resume}")
         model = Qwen2_5_VLForConditionalGeneration.from_pretrained(resume)
     else:
          # load model and data, optimizer
