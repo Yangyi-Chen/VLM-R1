@@ -14,7 +14,7 @@ data:
 
 training:
   max_epochs: 1
-  accumulate_grad_batches: 2
+  accumulate_grad_batches: 1
   weight_decay: 0.05
   lr: 0.000001
   record_middle: True
