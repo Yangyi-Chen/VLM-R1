@@ -13,9 +13,9 @@ import re
 def clean_text(text, exclue_chars=['\n', '\r']):
     # Extract content between <answer> and </answer> if present
     if template == 'answer':
-        answer_matches = re.findall(r'<{answer}>(.*?)</answer>', text, re.DOTALL)
+        answer_matches = re.findall(r'<answer>(.*?)</answer>', text, re.DOTALL)
     elif template == 'visual':
-        answer_matches = re.findall(r'<{visual}>(.*?)</visual>', text, re.DOTALL)
+        answer_matches = re.findall(r'<visual>(.*?)</visual>', text, re.DOTALL)
     else:
         raise ValueError(f"Unknown template: {template}")
     if answer_matches:
@@ -117,10 +117,10 @@ def batch_generate(test_data, processor, model, image_folder, batch_size):
             output_text = clean_text(output_text)
 
             # compute the metric
-            print(output_text)
-            print("*"*50)
-            print(clean_text(target_list[j]))
-            print("---"*50)
+            # print(output_text)
+            # print("*"*50)
+            # print(clean_text(target_list[j]))
+            # print("---"*50)
             metric_list.append(ratio(output_text, clean_text(target_list[j])))
         print(average(metric_list))
     return average(metric_list)
