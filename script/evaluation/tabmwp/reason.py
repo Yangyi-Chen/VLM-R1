@@ -201,7 +201,6 @@ if __name__ == "__main__":
     parser.add_argument("--batch_size", type=int, default=8)
     args = parser.parse_args()
 
-    template = args.template
     model_path = args.model_path
     BATCH_SIZE = args.batch_size
 
