@@ -403,8 +403,8 @@ def main(script_args, training_args, model_args):
         eval_dataset=splits.get('validation') if training_args.eval_strategy != "no" else None,
         peft_config=get_peft_config(model_args),
         attn_implementation=model_args.attn_implementation,
-        max_pixels=script_args.max_pixels,
-        min_pixels=script_args.min_pixels,
+        # max_pixels=script_args.max_pixels,
+        # min_pixels=script_args.min_pixels,
     )
 
     # Train and push the model to the Hub
