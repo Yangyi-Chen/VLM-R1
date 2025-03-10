@@ -11,7 +11,7 @@ torchrun --nproc_per_node="7" \
     --node_rank="0" \
     --master_addr="127.0.0.1" \
     --master_port="12346" \
-    src/open_r1/grpo.py \
+    src/open_r1/grpo_jsonl_text.py \
     --deepspeed local_scripts/zero3.json \
     --output_dir output/$RUN_NAME \
     --model_name_or_path  Qwen/Qwen2.5-3B-Instruct  \
