@@ -5,6 +5,7 @@ __pycache__/
 
 # C extensions
 *.so
+open-r1
 
 # Distribution / packaging
 .Python
