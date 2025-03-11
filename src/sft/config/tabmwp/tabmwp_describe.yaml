@@ -17,5 +17,5 @@ training:
   accumulate_grad_batches: 20
   weight_decay: 0.05
   lr: 0.00001
-  record: False
+  record_middle: False
 
