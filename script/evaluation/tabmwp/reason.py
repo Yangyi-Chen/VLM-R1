@@ -137,10 +137,8 @@ def batch_generate(test_data, processor, model, image_folder, batch_size):
         
         # Process batch
         batch_text = []
-        if image_folder is not None:
-            batch_image_inputs = []
-        else:
-            batch_image_inputs = None
+        batch_image_inputs = []
+       
 
         
         for messages in batch_messages:
@@ -153,14 +151,25 @@ def batch_generate(test_data, processor, model, image_folder, batch_size):
                 batch_image_inputs.extend(image_inputs)
         
         # Create inputs for the whole batch
-        inputs = processor(
-            text=batch_text,
-            images=batch_image_inputs,
-            videos=None,
-            padding=True,
-            return_tensors="pt",
-            padding_side="left"
-        )
+        if image_folder is not None:
+            inputs = processor(
+                text=batch_text,
+                images=batch_image_inputs,
+                videos=None,
+                padding=True,
+                return_tensors="pt",
+                padding_side="left"
+            )
+        else:
+            inputs = processor(
+                text=batch_text,
+                padding=True,
+                return_tensors="pt",
+                padding_side="left"
+            )
+
+
+            
         inputs = inputs.to("cuda")
         
         # Generate for the whole batch
