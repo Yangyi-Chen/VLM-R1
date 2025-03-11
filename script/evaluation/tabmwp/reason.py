@@ -1,6 +1,6 @@
 import argparse
 import os
-from transformers import Qwen2_5_VLForConditionalGeneration, AutoProcessor
+from transformers import Qwen2_5_VLForConditionalGeneration, AutoProcessor, AutoTokenizer, AutoModelForCausalLM
 import json
 from qwen_vl_utils import process_vision_info
 from tqdm import tqdm
@@ -113,37 +113,44 @@ def batch_generate(test_data, processor, model, image_folder, batch_size):
 
         # Prepare batch inputs
         for k in batch_keys:
-            image_path = os.path.join(image_folder, k + ".png")
-            messages = [
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "image",
-                            "image": image_path,
-                        },
-                        {"type": "text", "text": "<image>" + test_data[k]['question']},
-                    ],
-                }
-            ]
+            if image_folder is None:
+                messages = [
+                    {'role': 'user', 'content': test_data[k]['question'] + " <visual> " +  test_data[k]['table'] + " </visual>"}
+                ]
+            else:
+                image_path = os.path.join(image_folder, k + ".png")
+                messages = [
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "image",
+                                "image": image_path,
+                            },
+                            {"type": "text", "text": "<image>" + test_data[k]['question']},
+                        ],
+                    }
+                ]
             batch_messages.append(messages)
             target_list.append(test_data[k]["answer"])
 
         
         # Process batch
         batch_text = []
-        batch_image_inputs = []
-        # batch_video_inputs = []
+        if image_folder is not None:
+            batch_image_inputs = []
+        else:
+            batch_image_inputs = None
+
         
         for messages in batch_messages:
             text = processor.apply_chat_template(
                 messages, tokenize=False, add_generation_prompt=True
             )
-            image_inputs, video_inputs = process_vision_info(messages)
-            
             batch_text.append(text)
-            batch_image_inputs.extend(image_inputs)
-            # batch_video_inputs.extend(video_inputs)
+            if image_folder is not None:
+                image_inputs, video_inputs = process_vision_info(messages)
+                batch_image_inputs.extend(image_inputs)
         
         # Create inputs for the whole batch
         inputs = processor(
@@ -204,12 +211,18 @@ if __name__ == "__main__":
     BATCH_SIZE = args.batch_size
 
 
-    IMAGE_FOLDER = "/scratch/azureml/cr/j/f01af20a3317416d9343927e368a55a6/exe/wd/PromptPG/data/tabmwp/tables"
+    
 
 
+    if "VL" in model_path:
+        model = Qwen2_5_VLForConditionalGeneration.from_pretrained(model_path, torch_dtype=torch.bfloat16, attn_implementation="flash_attention_2").cuda()
+        processor = AutoProcessor.from_pretrained("Qwen/Qwen2.5-VL-3B-Instruct")
+        IMAGE_FOLDER = "/scratch/azureml/cr/j/f01af20a3317416d9343927e368a55a6/exe/wd/PromptPG/data/tabmwp/tables"
+    else:
+        model = AutoModelForCausalLM.from_pretrained(model_path, torch_dtype=torch.bfloat16, attn_implementation="flash_attention_2").cuda()
+        processor = AutoTokenizer.from_pretrained(model_path)
+        IMAGE_FOLDER = None
 
-    model = Qwen2_5_VLForConditionalGeneration.from_pretrained(model_path, torch_dtype=torch.bfloat16, attn_implementation="flash_attention_2").cuda()
-    processor = AutoProcessor.from_pretrained("Qwen/Qwen2.5-VL-3B-Instruct")
 
     test_data = read_json("/blob/v-yangyi/data/data_files/tabmwp/problems_test1k.json")
 
