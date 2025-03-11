@@ -215,6 +215,29 @@ elif parse_type == "rl_reason":
         os.makedirs(os.path.dirname(output_path))
     write_jsonl(output_path, save_data)
 
+elif parse_type == "rl_textreason":
+    input_path = "problems_train.json"
+    input_path = os.path.join(data_file_dir, input_path)
+    output_path = os.path.join("data", "tabmwp", "rl_textreason.jsonl")
+
+    src_data = read_json(input_path)
+
+    save_data = []
+    count = 0
+    for k, item in src_data.items():
+        conversations = [
+            {'from': 'human', 'value': item['question'] + " <visual> " + item['table'] + " </visual>"},
+            {'from': 'gpt', 'value': item['answer']}
+        ]
+
+        save_data.append({'id': count, "conversations": conversations, 'solution' : item['answer']})
+        count += 1
+    # check if the directory exists, if not create it
+    if not os.path.exists(os.path.dirname(output_path)):
+        os.makedirs(os.path.dirname(output_path))
+    write_jsonl(output_path, save_data)
+
+
 
 else:
     raise ValueError("Invalid parse type")
