@@ -1,0 +1,20 @@
+output_dir:  data/ckpt/Qwen2.5-VL_sft_tabmwp_textreason
+
+wandb_name: sft_tabmwp_textreason
+
+data:
+  data_module: TabMWPModule
+  max_position_embeddings: 8192
+  batch_size: 1
+  num_workers: 8
+  data_file: data/tabmwp/sft_textreason.jsonl
+ 
+
+
+training:
+  max_epochs: 1
+  accumulate_grad_batches: 20
+  weight_decay: 0.05
+  lr: 0.00001
+  record: False
+  text_model: True

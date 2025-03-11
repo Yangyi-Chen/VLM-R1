@@ -21,13 +21,15 @@ class TabMWPModule(BaseDataModule):
         def __init__(self, config: dict):
             self.config = config
             self.data_file_path = self.config["data"]["data_file"]
-            self.image_folder = self.config["data"]["image_folder"]
+            
             self.data_file = self.read_jsonl(self.data_file_path)
-            for item in self.data_file:
-                item['image'] = os.path.join(self.image_folder, item['image'])
+
+            if "image_folder" in self.config["data"]:
+                self.image_folder = self.config["data"]["image_folder"]
+                for item in self.data_file:
+                    item['image'] = os.path.join(self.image_folder, item['image'])
         
 
-    
             
 
         def __len__(self):
@@ -51,35 +53,54 @@ class TabMWPModule(BaseDataModule):
     def collate_fn(self, batch):
         assert len(batch) == 1
         sample = batch[0]
-        messages = [
-            {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "image",
-                        "image": sample['image'],
-                    },
-                    {"type": "text", "text": sample['conversations'][0]['value']},
-                ],
-            },
-            {"role": "assistant", "content":  sample['conversations'][1]['value']}
-        ]
-        text = self.processor.apply_chat_template(
-                messages, tokenize=False, add_generation_prompt=True
+
+        if 'image' in sample:
+            messages = [
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "image",
+                            "image": sample['image'],
+                        },
+                        {"type": "text", "text": sample['conversations'][0]['value']},
+                    ],
+                },
+                {"role": "assistant", "content":  sample['conversations'][1]['value']}
+            ]
+            text = self.processor.apply_chat_template(
+                    messages, tokenize=False, add_generation_prompt=True
+            )
+            image_inputs, video_inputs = process_vision_info(messages)
+            inputs = self.processor(
+                text=[text],
+                images=image_inputs,
+                videos=video_inputs,
+                padding=True,
+                return_tensors="pt",
+            )
+            
+            labels = inputs["input_ids"].clone()
+            inputs["labels"] = labels
+        else:
+            messages = [
+                {
+                    "role": "user",
+                    "content": sample['conversations'][0]['value']
+                },
+                {"role": "assistant", "content": sample['conversations'][1]['value']}
+            ]
+
+            text = self.processor.apply_chat_template(
+            messages,
+            tokenize=False,
+            add_generation_prompt=True
         )
-        image_inputs, video_inputs = process_vision_info(messages)
-        inputs = self.processor(
-            text=[text],
-            images=image_inputs,
-            videos=video_inputs,
-            padding=True,
-            return_tensors="pt",
-        )
-        
-        labels = inputs["input_ids"].clone()
-        inputs["labels"] = labels
-        
-        
+            
+            inputs = self.processor([text], return_tensors="pt")
+            labels = inputs["input_ids"].clone()
+            inputs["labels"] = labels
+
         return inputs
     
         

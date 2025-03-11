@@ -9,7 +9,7 @@ import os
 import math
 from transformers import get_scheduler
 from accelerate.utils import DummyOptim, DummyScheduler, set_seed
-from transformers import Qwen2_5_VLForConditionalGeneration, AutoProcessor
+from transformers import Qwen2_5_VLForConditionalGeneration, AutoProcessor, AutoModelForCausalLM, AutoTokenizer
 
 
 import os
@@ -31,15 +31,28 @@ def main():
     output_dir = config['output_dir']
     record = config['training']['record_middle']
     resume = config['training'].get('resume', None)
+    text_model = config['training'].get('text_model', False)
 
-    if resume is not None:
-        print(f"Resuming from {resume}")
-        model = Qwen2_5_VLForConditionalGeneration.from_pretrained(resume)
+    if text_model:
+        if resume is not None:
+            print(f"Resuming from {resume}")
+            model = AutoModelForCausalLM.from_pretrained(resume)
+        else:
+            model_name = "Qwen/Qwen2.5-3B-Instruct"
+            model = AutoModelForCausalLM.from_pretrained(
+                model_name
+            )
+            processor = AutoTokenizer.from_pretrained(model_name)
+
     else:
-         # load model and data, optimizer
-         print("Loading model. init from Qwen2.5-VL-3B-Instruct")
-         model = Qwen2_5_VLForConditionalGeneration.from_pretrained("Qwen/Qwen2.5-VL-3B-Instruct", cache_dir="./")
-    processor = AutoProcessor.from_pretrained("Qwen/Qwen2.5-VL-3B-Instruct")
+        if resume is not None:
+            print(f"Resuming from {resume}")
+            model = Qwen2_5_VLForConditionalGeneration.from_pretrained(resume)
+        else:
+            # load model and data, optimizer
+            print("Loading model. init from Qwen2.5-VL-3B-Instruct")
+            model = Qwen2_5_VLForConditionalGeneration.from_pretrained("Qwen/Qwen2.5-VL-3B-Instruct", cache_dir="./")
+        processor = AutoProcessor.from_pretrained("Qwen/Qwen2.5-VL-3B-Instruct")
     
     
     accelerator = Accelerator(gradient_accumulation_steps=accumulate_grad_batches, log_with="wandb", mixed_precision='bf16')    
