@@ -14,7 +14,24 @@ parse_type = args.parse_type
 data_file_dir = args.data_file_dir
 
 
- 
+def call_gpt(prompt):
+    from openai import OpenAI
+
+    client = OpenAI()
+
+    completion = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ]
+    )
+    return completion.choices[0].message.content
+
+
+
 
 def read_json(path):
     with open(path, 'r') as f:
@@ -236,6 +253,39 @@ elif parse_type == "rl_textreason":
     if not os.path.exists(os.path.dirname(output_path)):
         os.makedirs(os.path.dirname(output_path))
     write_jsonl(output_path, save_data)
+
+
+elif parse_type == 'generate_perception_train':
+    input_path = "problems_train.json"
+    input_path = os.path.join(data_file_dir, input_path)
+    output_path = os.path.join("data", "tabmwp", "rl_textreason.jsonl")
+
+    src_data = read_json(input_path)
+    import random
+    random.seed(42)
+    # shuffle the src_data dictionary
+    keys = list(src_data.keys())
+    random.shuffle(keys)
+
+
+
+    save_data = []
+    count = 0
+    for k, item in src_data.items():
+        conversations = [
+            {'from': 'human', 'value': item['question'] + " <visual> " + item['table'] + " </visual>"},
+            {'from': 'gpt', 'value': item['answer']}
+        ]
+
+        save_data.append({'id': count, "conversations": conversations, 'solution': item['answer']})
+        count += 1
+    # check if the directory exists, if not create it
+    if not os.path.exists(os.path.dirname(output_path)):
+        os.makedirs(os.path.dirname(output_path))
+    write_jsonl(output_path, save_data)
+#
+
+
 
 
 
