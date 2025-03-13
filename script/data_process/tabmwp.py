@@ -41,9 +41,12 @@ def write_jsonl(path, data):
     with jsonlines.open(path, 'w') as writer:
         writer.write_all(data)
 
- 
+def write_json(path, data):
+    with open(path, 'w') as f:
+        json.dump(data, f)
 
-# input_path = "problems_train.json"
+
+
 
 if parse_type == 'sft_describe':
     input_path = "problems_dev1k.json"
@@ -255,35 +258,45 @@ elif parse_type == "rl_textreason":
     write_jsonl(output_path, save_data)
 
 
-elif parse_type == 'generate_perception_train':
-    input_path = "problems_train.json"
+elif parse_type == 'generate_perception_test':
+    input_path = "problems_test1k.json"
     input_path = os.path.join(data_file_dir, input_path)
-    output_path = os.path.join("data", "tabmwp", "rl_textreason.jsonl")
+    output_path = os.path.join("data", "tabmwp", "perception_test.jsonl")
+
+
 
     src_data = read_json(input_path)
-    import random
-    random.seed(42)
-    # shuffle the src_data dictionary
-    keys = list(src_data.keys())
-    random.shuffle(keys)
+    # import random
+    # random.seed(42)
+    # # shuffle the src_data dictionary
+    # keys = list(src_data.keys())
+    # random.shuffle(keys)
 
+    save_data = {}
+    from tqdm import tqdm
 
+    generate_prompt = '''Here is the markdown table: \n"{}"\n Please generate one easy question that can be *directly* extracted and answered by looking at the table without any further reasoning. Return the question within <question> and </question> tag. Return the answer within <answer> and </answer> tag.'''
+    for k, item in tqdm(src_data.items()):
+       
+        table = src_data[k]['table']
+        prompt = generate_prompt.format(table)
+        gpt_response = call_gpt(prompt)
+        question = gpt_response.split('<question>')[1].split('</question>')[0]
+        answer = gpt_response.split('<answer>')[1].split('</answer>')[0]
 
-    save_data = []
-    count = 0
-    for k, item in src_data.items():
-        conversations = [
-            {'from': 'human', 'value': item['question'] + " <visual> " + item['table'] + " </visual>"},
-            {'from': 'gpt', 'value': item['answer']}
-        ]
+        save_data[k] = {
+            'question': question,
+            'answer': answer,
+            'table': table
+        }
+    
 
-        save_data.append({'id': count, "conversations": conversations, 'solution': item['answer']})
-        count += 1
     # check if the directory exists, if not create it
     if not os.path.exists(os.path.dirname(output_path)):
         os.makedirs(os.path.dirname(output_path))
-    write_jsonl(output_path, save_data)
-#
+    write_json(output_path, save_data)
+
+
 
 
 
