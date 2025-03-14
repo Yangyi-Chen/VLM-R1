@@ -192,7 +192,7 @@ def batch_generate(test_data, processor, model, image_folder, batch_size):
                 skip_special_tokens=True, 
                 clean_up_tokenization_spaces=False
             )[0]
-            
+            print(output_text)
             # Store the result
             metric = default_accuracy_reward(output_text, target_list[j])
             # compute the metric
