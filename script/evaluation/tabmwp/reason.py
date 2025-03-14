@@ -192,7 +192,7 @@ def batch_generate(test_data, processor, model, image_folder, batch_size):
                 skip_special_tokens=True, 
                 clean_up_tokenization_spaces=False
             )[0]
-            print(output_text)
+            # print(output_text)
             # Store the result
             metric = default_accuracy_reward(output_text, target_list[j])
             # compute the metric
@@ -235,7 +235,7 @@ if __name__ == "__main__":
 
     # test_data = read_json("/blob/v-yangyi/data/data_files/tabmwp/problems_test1k.json")
     test_data = read_json(os.path.join("data", "tabmwp", "perception_test.jsonl"))
-
+    print(test_data)
 
     metric = batch_generate(
         test_data=test_data,
