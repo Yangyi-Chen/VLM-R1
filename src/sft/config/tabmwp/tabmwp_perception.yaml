@@ -1,6 +1,6 @@
-output_dir:  data/ckpt/Qwen2.5-VL_sft_tabmwp_perception_ref
+output_dir:  data/ckpt/Qwen2.5-VL_sft_tabmwp_perception
 
-wandb_name: sft_tabmwp_perception_ref
+wandb_name: sft_tabmwp_perception
 
 data:
   data_module: TabMWPModule
