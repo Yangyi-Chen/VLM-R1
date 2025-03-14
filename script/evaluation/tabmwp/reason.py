@@ -196,6 +196,13 @@ def batch_generate(test_data, processor, model, image_folder, batch_size):
             # Store the result
             metric = default_accuracy_reward(output_text, target_list[j])
             # compute the metric
+            if metric != 1.0:
+                print(output_text)
+                print("*"*50)
+                print(clean_text(target_list[j]))
+                print("---"*50)
+
+
             metric_list.append(metric)
         
         print(average(metric_list))
