@@ -233,7 +233,9 @@ if __name__ == "__main__":
         IMAGE_FOLDER = None
 
 
-    test_data = read_json("/blob/v-yangyi/data/data_files/tabmwp/problems_test1k.json")
+    # test_data = read_json("/blob/v-yangyi/data/data_files/tabmwp/problems_test1k.json")
+    test_data = read_json(os.path.join("data", "tabmwp", "perception_test.jsonl"))
+
 
     metric = batch_generate(
         test_data=test_data,
