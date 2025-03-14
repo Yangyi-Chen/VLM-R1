@@ -231,13 +231,13 @@ def batch_generate(test_data, processor, model, image_folder, batch_size):
             # compute the metric
             if metric != 1.0:
                 metric = ai_check(test_data[k]['question'], test_data[k]['table'], test_data[k]['answer'], output_text)
-            if metric != 1.0:
-                print(test_data[k]['question'])
-                print(test_data[k]['table'])
-                print(test_data[k]['answer'])
-                print("-"*90)
-                print(output_text)
-                print("*"*50)
+            # if metric != 1.0:
+            #     print(test_data[k]['question'])
+            #     print(test_data[k]['table'])
+            #     print(test_data[k]['answer'])
+            #     print("-"*90)
+            #     print(output_text)
+            #     print("*"*50)
 
             metric_list.append(metric)
         
