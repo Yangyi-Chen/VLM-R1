@@ -300,6 +300,49 @@ elif parse_type == 'generate_perception_test':
 
 
 
+elif parse_type == 'generate_perception_train':
+    input_path = "problems_train.json"
+    input_path = os.path.join(data_file_dir, input_path)
+    output_path = os.path.join("data", "tabmwp", "perception_train.jsonl")
+
+
+
+    src_data = read_json(input_path)
+    import random
+    random.seed(42)
+    # shuffle the src_data dictionary
+    keys = list(src_data.keys())[:6000]
+    random.shuffle(keys)
+
+    save_data = []
+    from tqdm import tqdm
+
+    generate_prompt = '''Here is the markdown table: \n"{}"\n Please generate one easy question that can be *directly* extracted and answered by looking at the table without any further reasoning. Return the question within <question> and </question> tag. Return the answer within <answer> and </answer> tag.'''
+    count = 0
+    for key in tqdm(keys):
+        item = src_data[key]
+        table = item['table']
+        prompt = generate_prompt.format(table)
+        gpt_response = call_gpt(prompt)
+        question = gpt_response.split('<question>')[1].split('</question>')[0]
+        answer = gpt_response.split('<answer>')[1].split('</answer>')[0]
+        image = "tables/" + key + ".png"
+        conversations = [
+            {'from': 'human', 'value': "<image>"+ question},
+            {'from': 'gpt', 'value':  "<visual> " + item['table'] + " </visual>\n" + "<answer> " + answer + " </answer>"}
+        ]
+
+        save_data.append({
+            'id': count,
+            'image': image,
+            'conversations': conversations,  
+        })
+        count += 1
+   
+    # check if the directory exists, if not create it
+    if not os.path.exists(os.path.dirname(output_path)):
+        os.makedirs(os.path.dirname(output_path))
+    write_jsonl(output_path, save_data)
 
 
 else:

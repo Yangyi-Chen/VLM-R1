@@ -235,7 +235,7 @@ if __name__ == "__main__":
 
     # test_data = read_json("/blob/v-yangyi/data/data_files/tabmwp/problems_test1k.json")
     test_data = read_json(os.path.join("data", "tabmwp", "perception_test.jsonl"))
-    print(test_data)
+ 
 
     metric = batch_generate(
         test_data=test_data,
